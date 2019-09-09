@@ -42,6 +42,56 @@ Citizen.CreateThread(function()
 	end
 end)
 
+function animsAction(animObj)
+  Citizen.CreateThread(function()
+    if not playAnim then
+      local playerPed = GetPlayerPed(-1);
+      if DoesEntityExist(playerPed) then -- Ckeck if ped exist
+        dataAnim = animObj
+
+        -- Play Animation
+        RequestAnimDict(dataAnim.lib)
+        while not HasAnimDictLoaded(dataAnim.lib) do
+          Citizen.Wait(0)
+        end
+        if HasAnimDictLoaded(dataAnim.lib) then
+          local flag = 0
+          if dataAnim.loop ~= nil and dataAnim.loop then
+            flag = 1
+          elseif dataAnim.move ~= nil and dataAnim.move then
+            flag = 49
+          end
+          TaskPlayAnim(playerPed, dataAnim.lib, dataAnim.anim, 8.0, -8.0, -1, flag, 0, 0, 0, 0)
+          playAnimation = true
+        end
+
+        -- Wait end annimation
+        while true do
+          Citizen.Wait(0)
+          if not IsEntityPlayingAnim(playerPed, dataAnim.lib, dataAnim.anim, 3) then
+            playAnim = false
+            TriggerEvent('ft_animation:ClFinish')
+            break
+          end
+        end
+      end -- end ped exist
+    end
+  end) 
+end
+
+function animsActionScenario(animObj)
+  Citizen.CreateThread(function()
+    if not playAnim then
+      local playerPed = GetPlayerPed(-1);
+      if DoesEntityExist(playerPed) then
+        dataAnim = animObj
+        TaskStartScenarioInPlace(playerPed, dataAnim.anim, 0, false)
+        playAnimation = true
+      end
+    end
+  end)
+end
+
 AddEventHandler('esx_turtlepoaching:hasEnteredMarker', function(zone)
   if zone == 'TurtleSell' then
     if myJob ~= "police" then
@@ -136,17 +186,22 @@ Citizen.CreateThread(function()
           if Config.NeedBag then
           	if borsa == 40 or borsa == 41 or borsa == 44 or borsa == 45 then
               if CurrentAction == 'turtle_harvest_menu' then
-                Wait(500)
+                animsAction({ lib = "amb@code_human_police_investigate@idle_b", anim = "idle_f" })
+                Wait(2000)
                 TaskStartScenarioInPlace(GetPlayerPed(-1), 'world_human_stand_fishing', 0, false)
                 Wait(500)
                 TriggerServerEvent('esx_turtlepoaching:startHarvest', CurrentActionData.zone)
               end
               if CurrentAction == 'turtle_cutting' then
-                FreezeEntityPosition(PlayerPedId(), true)
+                animsAction({ lib = "amb@code_human_police_investigate@idle_b", anim = "idle_f" })
+                Wait(2000)
+                ClearPedTasks(GetPlayerPed(-1))
                 TriggerServerEvent('esx_turtlepoaching:startCutting', CurrentActionData.zone)
+                FreezeEntityPosition(PlayerPedId(), true)
               end
               if CurrentAction == 'turtle_resell' then
-                Wait(500)
+                animsAction({ lib = "amb@code_human_police_investigate@idle_b", anim = "idle_f" })
+                Wait(2000)
           	    TaskStartScenarioInPlace(GetPlayerPed(-1), 'WORLD_HUMAN_CLIPBOARD', 0, false)
           	    Wait(500)
                 TriggerServerEvent('esx_turtlepoaching:startSell', CurrentActionData.zone)
@@ -156,17 +211,22 @@ Citizen.CreateThread(function()
             end
           else
             if CurrentAction == 'turtle_harvest_menu' then
-              Wait(500)
+              animsAction({ lib = "amb@code_human_police_investigate@idle_b", anim = "idle_f" })
+              Wait(2000)
               TaskStartScenarioInPlace(GetPlayerPed(-1), 'world_human_stand_fishing', 0, false)
               Wait(500)
               TriggerServerEvent('esx_turtlepoaching:startHarvest', CurrentActionData.zone)
             end
             if CurrentAction == 'turtle_cutting' then
-              FreezeEntityPosition(PlayerPedId(), true)
+              animsAction({ lib = "amb@code_human_police_investigate@idle_b", anim = "idle_f" })
+              Wait(2000)
+              ClearPedTasks(GetPlayerPed(-1))
               TriggerServerEvent('esx_turtlepoaching:startCutting', CurrentActionData.zone)
+              FreezeEntityPosition(PlayerPedId(), true)
             end
             if CurrentAction == 'turtle_resell' then
-              Wait(500)
+              animsAction({ lib = "amb@code_human_police_investigate@idle_b", anim = "idle_f" })
+              Wait(2000)
           	  TaskStartScenarioInPlace(GetPlayerPed(-1), 'WORLD_HUMAN_CLIPBOARD', 0, false)
           	  Wait(500)
               TriggerServerEvent('esx_turtlepoaching:startSell', CurrentActionData.zone)
